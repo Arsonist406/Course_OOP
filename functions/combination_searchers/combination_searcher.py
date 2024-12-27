@@ -1,4 +1,4 @@
-class Combination_Calc:
+class Combination_Searcher:
     def __init__(self, hand, table):
         self.hand = hand
         self.cards = table + list(hand)
