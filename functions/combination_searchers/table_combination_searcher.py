@@ -12,21 +12,21 @@ class Table_Combination_Searcher:
         if self.isRoyalFlush():
             return f"Royal flush"
         if self.isStraightFlush():
-            return f"Straight flush {self.comb_score}"
+            return f"Straight flush"
         if self.isFourOfAKind():
-            return f"Four of a kind {self.comb_score}"
+            return f"Four of a kind"
         if self.isFullHouse():
-            return f"Full house {self.comb_score}"
+            return f"Full house"
         if self.isFlush():
-            return f"Flush {self.comb_score}"
+            return f"Flush"
         if self.isStraight():
-            return f"Straight {self.comb_score}"
+            return f"Straight"
         if self.isThreeOfAKind():
-            return f"Three of a kind {self.comb_score}"
+            return f"Three of a kind"
         if self.isTwoPair():
-            return f"Two pair {self.comb_score}"
+            return f"Two pair"
         if self.isPair():
-            return f"Pair {self.comb_score}"
+            return f"Pair"
         return self.highCard()
 
     def isRoyalFlush(self):
@@ -206,4 +206,5 @@ class Table_Combination_Searcher:
             if score > biggest_score:
                 biggest_score = score
 
+        self.comb_score = biggest_score
         return biggest_score

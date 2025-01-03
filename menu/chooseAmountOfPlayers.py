@@ -5,7 +5,7 @@ class ChooseAmountOfPlayers:
     def __init__(self, screen):
         self.screen = screen
 
-        func = LoadImage("D:\\Шарага\Проекти_на_пітоні\\Course_OOP_v2\\icons\\backgrounds\\choose_amount_of_players_menu.png", (1280, 720))
+        func = LoadImage("icons/backgrounds/menu/choose_amount_of_players_menu.png", (1280, 720))
         self.background_image = func.execute()
 
         self.for_two_button = pygame.Rect(540, 200, 200, 50)

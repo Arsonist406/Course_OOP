@@ -1,31 +1,41 @@
 class Combination_Searcher:
-    def __init__(self, hand, table):
-        self.hand = hand
-        self.cards = table + list(hand)
+    def __init__(self, table, hand):
+        self.playing_cards = table + list(hand)
+        self.values_order = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8,
+                            '9': 9, '10': 10, 'jack': 11, 'queen': 12, 'king': 13, 'ace': 14}
+        self.comb_score = 0
+        self.has_ace = False
+
+    def getCombScore(self):
+        return self.comb_score
+
+    def is_there_a_ace(self):
+        for card in self.playing_cards:
+            if card.getValue() == "ace":
+                self.has_ace = True
+                break
 
     def execute(self):
+        self.is_there_a_ace()
 
         if self.isRoyalFlush():
-            return "Royal flush"
-        '''
+            return f"Royal flush"
         if self.isStraightFlush():
-            return "Straight flush"
+            return f"Straight flush"
         if self.isFourOfAKind():
-            return "Four of a kind"
+            return f"Four of a kind"
         if self.isFullHouse():
-            return "Full house"
+            return f"Full house"
         if self.isFlush():
-            return "Flush"
+            return f"Flush"
         if self.isStraight():
-            return "Straight"
+            return f"Straight"
         if self.isThreeOfAKind():
-            return "Three of a kind"
+            return f"Three of a kind"
         if self.isTwoPair():
-            return "Two pair"
+            return f"Two pair"
         if self.isPair():
-            return "Pair"
-        '''
-
+            return f"Pair"
         return self.highCard()
 
     def isRoyalFlush(self):
@@ -33,7 +43,7 @@ class Combination_Searcher:
 
         # Ділимо карти по масті
         hash_suit_values = {}
-        for card in self.cards:
+        for card in self.playing_cards:
             suit = card.getSuit()
             if suit in hash_suit_values:
                 hash_suit_values[suit].append(card.getValue())
@@ -47,39 +57,55 @@ class Combination_Searcher:
         return False
 
     def isStraightFlush(self):
-        value_order = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
-                      '10': 10, 'jack': 11, 'queen': 12, 'king': 13, 'ace': 14}
-
-        values_order = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king', 'ace']
-
         # Ділимо карти по масті
         hash_suit_values = {}
-        for card in self.cards:
+        for card in self.playing_cards:
             suit = card.getSuit()
             if suit in hash_suit_values:
                 hash_suit_values[suit].append(card.getValue())
             else:
                 hash_suit_values[suit] = [card.getValue()]
 
-        # Для кожної масті перевіряємо умову Straight flush
-        for values in hash_suit_values.values():
-            if len(values) >= 5:
-                return True
-        return False
+        # Отримуємо список значень карт
+        comb_found = False
+        for suit, values in hash_suit_values.items():
+           if len(values) >= 5:
+               temp = []
+               for value in values:
+                   temp.append(self.values_order[value])
+
+               if self.has_ace:
+                   temp.append(1)
+
+               temp = sorted(temp)
+               for i in range(len(temp) - 4):
+                   if (temp[i] == temp[i + 1] - 1 and temp[i + 1] == temp[i + 2] - 1 and
+                       temp[i + 2] == temp[i + 3] - 1 and temp[i + 3] == temp[i + 4] - 1):
+                       comb_found = True
+                       self.comb_score = 0
+                       for j in range(i, i + 5):
+                           self.comb_score += temp[j]
+
+        if comb_found:
+            return True
+        else:
+            return False
 
     def isFourOfAKind(self):
         value_count = {}  # Словник для підрахунку карт за рангами
 
         # Підрахунок кількості кожного рангу
-        for card in self.cards:
+        for card in self.playing_cards:
             if card.getValue() in value_count:
                 value_count[card.getValue()] += 1
             else:
                 value_count[card.getValue()] = 1
 
         # Перевірка, чи є хоча б один ранг, що зустрічається 4 рази
-        for count in value_count.values():
+        for value, count in value_count.items():
             if count == 4:
+                self.comb_score = 0
+                self.comb_score = self.values_order[value] * 4
                 return True
 
         return False
@@ -88,52 +114,114 @@ class Combination_Searcher:
         value_count = {}  # Словник для підрахунку карт за рангами
 
         # Підрахунок кількості кожного рангу
-        for card in self.cards:
+        for card in self.playing_cards:
             if card.getValue() in value_count:
                 value_count[card.getValue()] += 1
             else:
                 value_count[card.getValue()] = 1
 
         # Для фулл-хауса потрібно, щоб було 1 трійка і 1 пара
-        counts = list(value_count.values())
+        counts = sorted(list(value_count.values()))
 
         # Перевірка, чи є 1 трійка (3 однакові карти) і 1 пара (2 однакові карти)
-        if sorted(counts) == [2, 3]:
+        if counts == [1, 3, 3]:
+            temp = []
+            for value, count in value_count.items():
+                if count == 3:
+                    temp.append(self.values_order[value])
+            temp = sorted(temp)
+            self.comb_score = 0
+            self.comb_score += temp[0] * 2
+            self.comb_score += temp[1] * 3
+            return True
+        elif counts == [2, 2, 3]:
+            temp = []
+            three = None
+            for value, count in value_count.items():
+                if count == 3:
+                    three = self.values_order[value]
+                else:
+                    temp.append(self.values_order[value])
+            temp = sorted(temp)
+            self.comb_score = 0
+            self.comb_score += temp[1] * 2
+            self.comb_score += three * 3
+            return True
+        elif counts == [1, 1, 2, 3]:
+            self.comb_score = 0
+            counts_with_value = sorted(list(value_count.items()), key=lambda x: x[1])
+            self.comb_score += self.values_order[counts_with_value[-2][0]] * 2
+            self.comb_score += self.values_order[counts_with_value[-1][0]] * 3
             return True
         return False
 
     def isFlush(self):
-        # Перевірка, чи всі карти однієї масті
-        suits = {card.getSuit() for card in self.cards}  # Множина мастей карт
-        return len(suits) == 1  # Якщо всі карти однієї масті, то множина містить тільки 1 елемент
+        # Ділимо карти по масті
+        hash_suit_values = {}
+        for card in self.playing_cards:
+            suit = card.getSuit()
+            if suit in hash_suit_values:
+                hash_suit_values[suit].append(card.getValue())
+            else:
+                hash_suit_values[suit] = [card.getValue()]
+
+        # Для кожної масті перевіряємо умову flush
+        for values in hash_suit_values.values():
+            if len(values) >= 5:
+                temp = []
+                for value in values:
+                    temp.append(self.values_order[value])
+                temp = sorted(temp)
+
+                self.comb_score = 0
+                for elem, _ in zip(reversed(temp), range(5)):
+                    self.comb_score += elem
+                return True
+        return False
 
     def isStraight(self):
-        value_order = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
-                      '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
-
         # Отримуємо список значень карт і перетворюємо їх в числа
-        values = sorted([value_order[card.getValue()] for card in self.cards])
+        temp = []
+        for card in self.playing_cards:
+            if self.values_order[card.getValue()] in temp:
+                continue
+            else:
+                temp.append(self.values_order[card.getValue()])
 
-        # Перевіряємо, чи є п'ять карт підряд
-        for i in range(1, len(values)):
-            if values[i] != values[i - 1] + 1:
-                return False
+        if self.has_ace:
+            temp.append(1)
 
-        return True
+        temp = sorted(temp)
+
+        comb_found = False
+        for i in range(len(temp) - 4):
+            if (temp[i] == temp[i + 1] - 1 and temp[i + 1] == temp[i + 2] - 1 and
+                temp[i + 2] == temp[i + 3] - 1 and temp[i + 3] == temp[i + 4] - 1):
+                comb_found = True
+                self.comb_score = 0
+                for j in range(i, i + 5):
+                    self.comb_score += temp[j]
+
+        if comb_found:
+            return True
+        else:
+            return False
 
     def isThreeOfAKind(self):
         value_count = {}  # Словник для підрахунку карт за рангами
 
         # Підрахунок кількості кожного рангу
-        for card in self.cards:
+        for card in self.playing_cards:
             if card.getValue() in value_count:
                 value_count[card.getValue()] += 1
             else:
                 value_count[card.getValue()] = 1
 
         # Перевірка, чи є хоча б один ранг, що зустрічається 3 рази
-        for count in value_count.values():
+        for value, count in value_count.items():
             if count == 3:
+                self.comb_score = 0
+                self.comb_score = self.values_order[value] * 3
                 return True
         return False
 
@@ -141,46 +229,56 @@ class Combination_Searcher:
         value_count = {}  # Словник для підрахунку карт за рангами
 
         # Підрахунок кількості кожного рангу
-        for card in self.cards:
+        for card in self.playing_cards:
             if card.getValue() in value_count:
                 value_count[card.getValue()] += 1
             else:
                 value_count[card.getValue()] = 1
 
         # Підрахунок кількості пар (дві карти одного значення)
-        pairs = 0
-        for count in value_count.values():
+        pairs = []
+        self.comb_score = 0
+        for value, count in value_count.items():
             if count == 2:
-                pairs += 1
+                pairs.append(value)
 
-        # Перевірка на дві пари
-        return pairs == 2
+        if len(pairs) == 2:
+            self.comb_score += self.values_order[pairs[0]] * 2
+            self.comb_score += self.values_order[pairs[1]] * 2
+            return True
+        elif len(pairs) == 3:
+            temp = sorted([self.values_order[pairs[0]], self.values_order[pairs[1]], self.values_order[pairs[2]]])
+            self.comb_score += temp[-1] * 2
+            self.comb_score += temp[-2] * 2
+            return True
+        return False
 
     def isPair(self):
         value_count = {}  # Словник для підрахунку карт за рангами
 
         # Підрахунок кількості кожного рангу
-        for card in self.cards:
+        for card in self.playing_cards:
             if card.getValue() in value_count:
                 value_count[card.getValue()] += 1
             else:
                 value_count[card.getValue()] = 1
 
         # Перевірка, чи є хоча б один ранг, що зустрічається 2 рази
-        for count in value_count.values():
+        for value, count in value_count.items():
             if count == 2:
+                self.comb_score = 0
+                self.comb_score = self.values_order[value] * 2
                 return True
         return False
 
     def highCard(self):
-        # Створюємо словник для відповідності рангу карт числовим значенням
-        value_order = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
-                      '10': 10, 'jack': 11, 'queen': 12, 'king': 13, 'ace': 14}
-
         # Знаходимо картку з найвищим значенням
-        value = self.hand[0].getValue()
-        first_card_score = value_order[value]
-        value = self.hand[1].getValue()
-        second_card_score = value_order[value]
+        biggest_score = 0
+        for card in self.playing_cards:
+            value = card.getValue()
+            score = self.values_order[value]
+            if score > biggest_score:
+                biggest_score = score
 
-        return self.hand[0] if first_card_score > second_card_score else self.hand[1]
+        self.comb_score = biggest_score
+        return "High"

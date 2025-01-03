@@ -2,7 +2,7 @@ import sys
 import pygame
 
 from functions.drawButton import DrawButton
-from functions.drawtext import DrawText
+from functions.drawText import DrawText
 from functions.loadImage import LoadImage
 from game.game import Game
 
@@ -21,19 +21,13 @@ class SetCurrentGameSettings:
 
         # Задній фон
         if self.amount_of_players == 2:
-            func = LoadImage(
-                "D:\\Шарага\Проекти_на_пітоні\\Course_OOP_v2\\icons\\backgrounds\\card_deal_for_2_players_menu.png",
-                (1280, 720))
+            func = LoadImage("icons/backgrounds/menu/card_deal_for_2_players_menu.png",(1280, 720))
             self.background_image = func.execute()
         elif self.amount_of_players == 3:
-            func = LoadImage(
-                "D:\\Шарага\Проекти_на_пітоні\\Course_OOP_v2\\icons\\backgrounds\\card_deal_for_3_players_menu.png",
-                (1280, 720))
+            func = LoadImage("icons/backgrounds/menu/card_deal_for_3_players_menu.png",(1280, 720))
             self.background_image = func.execute()
         elif self.amount_of_players == 4:
-            func = LoadImage(
-                "D:\\Шарага\Проекти_на_пітоні\\Course_OOP_v2\\icons\\backgrounds\\card_deal_for_4_players_menu.png",
-                (1280, 720))
+            func = LoadImage("icons/backgrounds/menu/card_deal_for_4_players_menu.png",(1280, 720))
             self.background_image = func.execute()
 
         i = 0
@@ -86,7 +80,7 @@ class SetCurrentGameSettings:
 
             for i, box in enumerate(self.input_boxes):
                 pygame.draw.rect(self.screen, self.FIELD_COLOR, box)
-                pygame.draw.rect(self.screen, self.BLACK, box, 2)  # Малюємо контур поля
+                pygame.draw.rect(self.screen, self.BLACK, box, 2)
                 func = DrawText(self.names[i], self.font, self.BLACK, self.screen, box.x + 10, box.y + 10)
                 func.execute()
 

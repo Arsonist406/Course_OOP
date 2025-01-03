@@ -2,12 +2,12 @@ import pygame
 from animations.cardMoving import CardMoving
 
 class TwoCardsMoving:
-    def __init__(self, screen,  table_image, card_back_image, player_pos, card_ang, discard_deck_pos):
+    def __init__(self, screen,  table_image, card_back_image, player_pos, discard_deck_pos):
         self.screen = screen
         self.table_image = table_image
         self.card_back_image = card_back_image
         self.coord1, self.coord2 = player_pos
-        self.card_ang = card_ang
+        self.card_ang = 0
         self.discard_deck_pos = discard_deck_pos
 
     def execute(self):

@@ -1,5 +1,5 @@
 import pygame
-from functions.drawtext import DrawText
+from functions.drawText import DrawText
 
 class DrawButton:
     def __init__(self, screen, font, button_text, button_rect, rect_color, text_color):

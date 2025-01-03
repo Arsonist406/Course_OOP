@@ -14,7 +14,7 @@ card_image = pygame.image.load("D:\\Шарага\\Проекти_на_пітон
 card_image = pygame.transform.scale(card_image, (100, 150))
 
 # Завантаження зображень стола
-table_image = pygame.image.load("../icons/backgrounds/table.png")
+table_image = pygame.image.load("../icons/backgrounds/game/table.png")
 table_image = pygame.transform.scale(table_image, (1280, 720))
 
 # Налаштування точок, куди карти будуть роздані
@@ -73,7 +73,7 @@ def animate_card(start_pos, end_pos, angle):
 for pos, angle in zip(deck_position, card_angles):
     animate_card(card_start_pos, pos, angle)
 
-pygame.image.save(screen, "../../Course_OOP_v2/icons/backgrounds/table_with_deck.png")
+pygame.image.save(screen, "../icons/backgrounds/game/table_with_deck.png")
 print("Зображення столу збережено як 'table_with_deck.png'")
 
 pygame.time.delay(1000)  # Затримка для перегляду результату
