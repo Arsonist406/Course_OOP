@@ -12,7 +12,7 @@ from players.player import Player
 
 import ctypes
 from ctypes import POINTER, c_void_p, c_int, c_char_p
-lib = ctypes.CDLL('cpp/comb_calculator.dll')
+lib = ctypes.CDLL('cpp/lib/comb_calculator.dll')
 class CtypesCard(ctypes.Structure):
     _fields_ = [("suit", ctypes.c_char_p), ("value", ctypes.c_char_p)]
 
