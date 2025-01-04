@@ -65,7 +65,7 @@ class SetCurrentGameSettings:
                     if self.confirm_button.collidepoint(event.pos):
                         game = Game(self.screen, self.amount_of_players, self.names)
                         game.execute()
-                        running = False
+                        return "end"
 
                     elif self.back_button.collidepoint(event.pos):
                         running = False

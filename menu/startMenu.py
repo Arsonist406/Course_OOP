@@ -29,7 +29,7 @@ class StartMenu:
                         menu.execute()
 
                     elif self.exit_button.collidepoint(event.pos):
-                        running = False
+                        return
 
             pygame.display.update()
 

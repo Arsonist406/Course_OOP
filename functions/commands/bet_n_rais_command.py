@@ -1,5 +1,8 @@
-class BetNRaisCommand:
+from functions.commands.command import Command
+
+class BetNRaisCommand(Command):
     def __init__(self, bank, player, player_bet, hash_player_bet):
+        super().__init__()
         self.bank = bank
         self.player = player
         self.player_bet = player_bet

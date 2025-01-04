@@ -34,7 +34,6 @@ class Game:
         self.biggest_bet = 0
         self.table_cards = [None] * 5
         self.playing = True
-        self.command_name = None
         self.winner_comb = ""
 
         self.table = Table(self.screen, self.players_for_game, self.bank, self.deck, self.table_cards, self.hash_player_bet)
@@ -164,21 +163,8 @@ class Game:
         self.winner_comb = greatest_comb_str
         return list_of_winners
 
-    def command_execute(self, command_name, player):
-        if command_name == "Fold":
-            command = FoldCommand(self.screen, self.table.get_table_image(), self.table.get_card_back_image(),
-                                  self.table.get_hash_player_pos(), self.table.get_deck_pos(), self.players, player)
-            command.execute()
-
-        elif command_name == "Call":
-            command = CallCommand(self.bank, player, self.biggest_bet, self.hash_player_bet)
-            command.execute()
-
-        elif command_name == "Bet" or command_name == "Rais":
-            command = BetNRaisCommand(self.bank, player, self.table.get_player_bet(), self.hash_player_bet)
-            command.execute()
-
     def execute(self):
+        command = None
         self.table.create_table()
 
         while self.playing:
@@ -260,8 +246,8 @@ class Game:
                     self.table.clear_table(stage)
                     break
 
-                betting = True # Торги
-                while betting:
+                # Торги
+                while True:
                     for player in self.players:
                         if self.how_many_active_players() == 1:
                             break
@@ -273,17 +259,17 @@ class Game:
 
                                 self.biggest_bet = max(int(value) for value in self.hash_player_bet.values())
 
-                                self.command_name = self.table.turn(player)
-                                if self.command_name == "Exit":
+                                command = self.table.turn(player)
+                                if command == "Exit":
                                     break
 
-                                self.command_execute(self.command_name, player)
+                                command.execute()
 
                                 self.table.print_bank()
                                 self.table.print_player_info(player)
                                 self.biggest_bet = max(int(value) for value in self.hash_player_bet.values())
 
-                    if self.command_name == "Exit":
+                    if command == "Exit":
                         break
 
                     # Якщо один гравець активний (інші зафолдили), цього гравця визначаємо переможцем
@@ -309,9 +295,10 @@ class Game:
                         all_equal = all(value == values[0] for value in values)
 
                         # Якщо не у всіх ставки рівні - продовжуємо торги
-                        betting = not all_equal
+                        if all_equal:
+                            break
 
-                if self.command_name == "Exit":
+                if command == "Exit":
                     break
 
                 if winner is not None:
@@ -323,5 +310,5 @@ class Game:
                     self.table.clear_table(stage)
                     break
 
-            if self.command_name == "Exit":
+            if command == "Exit":
                 break

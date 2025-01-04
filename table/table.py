@@ -10,6 +10,10 @@ from animations.cardRotation import CardRotation
 from animations.shuffleDeck import ShuffleDeck
 from animations.twoCardsMoving import TwoCardsMoving
 from functions.blitOverlay import BlitOverlay
+from functions.commands.bet_n_rais_command import BetNRaisCommand
+from functions.commands.callCommand import CallCommand
+from functions.commands.checkCommand import CheckCommand
+from functions.commands.foldCommand import FoldCommand
 from functions.drawButton import DrawButton
 from functions.drawText import DrawText
 from functions.loadImage import LoadImage
@@ -501,7 +505,7 @@ class Table:
 
         elif current_stage == "Turn":
             # Відкриваємо закриту карту
-            animation = CardRotation(self.screen, self.hash_card_image[4], self.card_back_image,
+            animation = CardRotation(self.screen, self.hash_card_image[self.table_cards[4]], self.card_back_image,
                                      self.deal_card_pos[4], self.deal_card_ang[4])
             animation.execute()
 
@@ -528,8 +532,7 @@ class Table:
             self.table_image = func.execute()
 
             # "Скидує" карти у відбій
-            func = CardMoving(self.screen, pos, self.deck_pos, ang,
-                              self.table_image, self.card_back_image)
+            func = CardMoving(self.screen, pos, self.deck_pos, ang, self.table_image, self.card_back_image)
             func.execute()
 
         func = ShuffleDeck(self.screen, self.deck_pos, self.table_image, self.card_back_image)
@@ -670,11 +673,9 @@ class Table:
                             self.thread.start()
 
                     elif self.menu_button_rect.collidepoint(event.pos):
-                        print("menu")
                         return "Exit"
 
                     elif self.question_button_rect.collidepoint(event.pos):
-                        print("question")
                         self.show_tutorial()
 
                     elif self.up_button_rect.collidepoint(event.pos):
@@ -692,26 +693,27 @@ class Table:
                                 self.player_bet = str(int(self.player_bet) - 10)
 
                     elif self.fold_button_rect.collidepoint(event.pos):
-                        command = "Fold"
+                        command = FoldCommand(self.screen, self.table_image, self.card_back_image,
+                                              self.hash_player_pos, self.deck_pos, player)
                         running = False
 
                     elif self.check_n_call_button_rect.collidepoint(event.pos):
                         if self.check_n_call_button_text == "Check":
-                            command = "Check"
+                            command = CheckCommand(self.hash_player_bet, player)
                             running = False
 
                         elif self.check_n_call_button_text == "Call":
-                            command = "Call"
+                            command = CallCommand(self.bank, player, self.biggest_bet, self.hash_player_bet)
                             running = False
 
                     elif self.bet_n_rais_button_rect.collidepoint(event.pos):
                         if self.bet_n_rais_button_text == "Bet":
-                            command = "Bet"
+                            command = BetNRaisCommand(self.bank, player, self.player_bet, self.hash_player_bet)
                             running = False
 
                         elif self.bet_n_rais_button_text == "Rais":
                             if int(self.player_bet) >= self.biggest_bet * 2:
-                                command = "Rais"
+                                command = BetNRaisCommand(self.bank, player, self.player_bet, self.hash_player_bet)
                                 running = False
                             else:
                                 input_box_red_alpha = 148

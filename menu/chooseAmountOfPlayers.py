@@ -14,6 +14,7 @@ class ChooseAmountOfPlayers:
         self.back_button = pygame.Rect(540, 410, 200, 50)
 
     def execute(self):
+        flag = None
         running = True
         while running:
             self.screen.blit(self.background_image, (0, 0))
@@ -26,20 +27,20 @@ class ChooseAmountOfPlayers:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.for_two_button.collidepoint(event.pos):
                         menu = SetCurrentGameSettings(self.screen, 2)
-                        menu.execute()
-                        running = False
+                        flag = menu.execute()
 
                     elif self.for_three_button.collidepoint(event.pos):
                         menu = SetCurrentGameSettings(self.screen, 3)
-                        menu.execute()
-                        running = False
+                        flag = menu.execute()
 
                     elif self.for_four_button.collidepoint(event.pos):
                         menu = SetCurrentGameSettings(self.screen, 4)
-                        menu.execute()
-                        running = False
+                        flag = menu.execute()
 
                     elif self.back_button.collidepoint(event.pos):
-                        running = False
-
+                        return
+            
+            if flag is not None and flag == "end":
+                return
+            
             pygame.display.update()

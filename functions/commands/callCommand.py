@@ -1,5 +1,8 @@
-class CallCommand:
+from functions.commands.command import Command
+
+class CallCommand(Command):
     def __init__(self, bank, player, biggest_bet, hash_player_bet):
+        super().__init__()
         self.bank = bank
         self.player = player
         self.biggest_bet = biggest_bet
