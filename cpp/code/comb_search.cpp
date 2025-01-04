@@ -1,7 +1,7 @@
 #include "card.h"
 #include "comb_search.h"
 
-// Реалізація методів класу CombinationSearcher
+// Р РµР°Р»С–Р·Р°С†С–СЏ РјРµС‚РѕРґС–РІ РєР»Р°СЃСѓ CombinationSearcher
 CombinationSearcher::CombinationSearcher(const vector<Card>& table, const vector<Card>& hand) {
     playing_cards.reserve(table.size() + hand.size());
     playing_cards.insert(playing_cards.end(), table.begin(), table.end());
@@ -60,27 +60,27 @@ bool CombinationSearcher::isRoyalFlush() {
     unordered_map<string, vector<int>> suit_map;
     divideBySuit(suit_map);
 
-    // Перевірка, чи є 5 карт однієї масті
+    // РџРµСЂРµРІС–СЂРєР°, С‡Рё С” 5 РєР°СЂС‚ РѕРґРЅС–С”С— РјР°СЃС‚С–
     for (const auto& pair : suit_map) {
         const vector<int>& values = pair.second;
         if (values.size() >= 5) {
             bool is_royal_flush = true;
 
-            // Перевірка, чи є royal_flush_values підмножиною values
+            // РџРµСЂРµРІС–СЂРєР°, С‡Рё С” royal_flush_values РїС–РґРјРЅРѕР¶РёРЅРѕСЋ values
             for (const int& royal_value : royal_flush_values) {
-                // std::find поверну values.end(), якщо не знайде royal_value в values
+                // std::find РїРѕРІРµСЂРЅСѓ values.end(), СЏРєС‰Рѕ РЅРµ Р·РЅР°Р№РґРµ royal_value РІ values
                 if (std::find(values.begin(), values.end(), royal_value) == values.end()) {
                     is_royal_flush = false;
                     break;
                 }
             }
-            // Якщо всі royal_flush_values знайдені, це Royal Flush
+            // РЇРєС‰Рѕ РІСЃС– royal_flush_values Р·РЅР°Р№РґРµРЅС–, С†Рµ Royal Flush
             if (is_royal_flush) {
                 return true;
             }
         }
     }
-    // Якщо жодна масть не відповідає умовам
+    // РЇРєС‰Рѕ Р¶РѕРґРЅР° РјР°СЃС‚СЊ РЅРµ РІС–РґРїРѕРІС–РґР°С” СѓРјРѕРІР°Рј
     return false;
 }
 
@@ -88,19 +88,19 @@ bool CombinationSearcher::isStraightFlush() {
     unordered_map<string, vector<int>> suit_map;
     divideBySuit(suit_map);
 
-    // Перевірка, чи є 5 карт однієї масті
+    // РџРµСЂРµРІС–СЂРєР°, С‡Рё С” 5 РєР°СЂС‚ РѕРґРЅС–С”С— РјР°СЃС‚С–
     for (const auto& pair : suit_map) {
         const vector<int>& values = pair.second;
         if (values.size() >= 5) {
             vector<int> plc_values(values);
 
             if (has_ace) {
-                plc_values.push_back(1);  // Якщо є туз, додає 1 для розрахунку можливої низької комбінації (ace, 2, 3, 4, 5)
+                plc_values.push_back(1);  // РЇРєС‰Рѕ С” С‚СѓР·, РґРѕРґР°С” 1 РґР»СЏ СЂРѕР·СЂР°С…СѓРЅРєСѓ РјРѕР¶Р»РёРІРѕС— РЅРёР·СЊРєРѕС— РєРѕРјР±С–РЅР°С†С–С— (ace, 2, 3, 4, 5)
             }
 
             std::sort(plc_values.begin(), plc_values.end());
 
-            // Перевіряємо чи є послідовність п'яти карт
+            // РџРµСЂРµРІС–СЂСЏС”РјРѕ С‡Рё С” РїРѕСЃР»С–РґРѕРІРЅС–СЃС‚СЊ Рї'СЏС‚Рё РєР°СЂС‚
             for (size_t i = 0; i < plc_values.size() - 4; ++i) {
                 if (plc_values[i] == plc_values[i + 1] - 1 && plc_values[i + 1] == plc_values[i + 2] - 1 && plc_values[i + 2] == plc_values[i + 3] - 1 && plc_values[i + 3] == plc_values[i + 4] - 1) {
                     comb_score = 0;
@@ -119,7 +119,7 @@ bool CombinationSearcher::isFourOfAKind() {
     unordered_map<string, int> value_count;
     valueCounter(value_count);
 
-    // Перевірка, чи є 4 карти одного рангу
+    // РџРµСЂРµРІС–СЂРєР°, С‡Рё С” 4 РєР°СЂС‚Рё РѕРґРЅРѕРіРѕ СЂР°РЅРіСѓ
     for (const auto& pair : value_count) {
         const string& value = pair.first;
         int count = pair.second;
@@ -143,7 +143,7 @@ bool CombinationSearcher::isFullHouse() {
 
     std::sort(counts.begin(), counts.end());
 
-    // Якщо 1 3 3 - знаходить, який з 3 має сильніший ранг і його множить на 3 під час розрахунку comb_score
+    // РЇРєС‰Рѕ 1 3 3 - Р·РЅР°С…РѕРґРёС‚СЊ, СЏРєРёР№ Р· 3 РјР°С” СЃРёР»СЊРЅС–С€РёР№ СЂР°РЅРі С– Р№РѕРіРѕ РјРЅРѕР¶РёС‚СЊ РЅР° 3 РїС–Рґ С‡Р°СЃ СЂРѕР·СЂР°С…СѓРЅРєСѓ comb_score
     if (counts == vector<int>{1, 3, 3}) {
         vector<int> temp;
         for (const auto& pair : value_count) {
@@ -156,7 +156,7 @@ bool CombinationSearcher::isFullHouse() {
         comb_score = temp[0] * 2 + temp[1] * 3;
         return true;
     }
-    // Якщо 2 2 3 - знаходить, який з 2 має сильніший ранг і його множить на 2 під час розрахунку comb_score
+    // РЇРєС‰Рѕ 2 2 3 - Р·РЅР°С…РѕРґРёС‚СЊ, СЏРєРёР№ Р· 2 РјР°С” СЃРёР»СЊРЅС–С€РёР№ СЂР°РЅРі С– Р№РѕРіРѕ РјРЅРѕР¶РёС‚СЊ РЅР° 2 РїС–Рґ С‡Р°СЃ СЂРѕР·СЂР°С…СѓРЅРєСѓ comb_score
     else if (counts == vector<int>{2, 2, 3}) {
         int three = 0;
         vector<int> temp;
@@ -173,7 +173,7 @@ bool CombinationSearcher::isFullHouse() {
         comb_score = temp[1] * 2 + three * 3;
         return true;
     }
-    // Якщо 1 1 2 3 - знаходить 2 і 3 і їх використовує під час розрахунку comb_score
+    // РЇРєС‰Рѕ 1 1 2 3 - Р·РЅР°С…РѕРґРёС‚СЊ 2 С– 3 С– С—С… РІРёРєРѕСЂРёСЃС‚РѕРІСѓС” РїС–Рґ С‡Р°СЃ СЂРѕР·СЂР°С…СѓРЅРєСѓ comb_score
     else if (counts == vector<int>{1, 1, 2, 3}) {
         int two_value = 0;
         int three_value = 0;
@@ -197,14 +197,14 @@ bool CombinationSearcher::isFlush() {
     unordered_map<string, vector<int>> suit_map;
     divideBySuit(suit_map);
 
-    // Перевірка, чи є 5 карт однієї масті
+    // РџРµСЂРµРІС–СЂРєР°, С‡Рё С” 5 РєР°СЂС‚ РѕРґРЅС–С”С— РјР°СЃС‚С–
     for (const auto& pair : suit_map) {
         const vector<int>& values = pair.second;
         if (values.size() >= 5) {
             vector<int> temp(values);
             std::sort(temp.begin(), temp.end());
 
-            // Підраховує comb_score для останнніх 5 елементів
+            // РџС–РґСЂР°С…РѕРІСѓС” comb_score РґР»СЏ РѕСЃС‚Р°РЅРЅРЅС–С… 5 РµР»РµРјРµРЅС‚С–РІ
             comb_score = 0;
             for (int i = 0; i < 5; ++i) {
                 comb_score += temp[temp.size() - 1 - i];
@@ -216,7 +216,7 @@ bool CombinationSearcher::isFlush() {
 }
 
 bool CombinationSearcher::isStraight() {
-    // Записує в plc_values які ранги є в playing_cards
+    // Р—Р°РїРёСЃСѓС” РІ plc_values СЏРєС– СЂР°РЅРіРё С” РІ playing_cards
     vector<int> plc_values; // playing_cards_values
     for (const auto& card : playing_cards) {
         int card_value = values_order[card.getValue()];
@@ -226,12 +226,12 @@ bool CombinationSearcher::isStraight() {
     }
 
     if (has_ace) {
-        plc_values.push_back(1);  // Якщо є туз, додає 1 для розрахунку можливої низької комбінації (ace, 2, 3, 4, 5)
+        plc_values.push_back(1);  // РЇРєС‰Рѕ С” С‚СѓР·, РґРѕРґР°С” 1 РґР»СЏ СЂРѕР·СЂР°С…СѓРЅРєСѓ РјРѕР¶Р»РёРІРѕС— РЅРёР·СЊРєРѕС— РєРѕРјР±С–РЅР°С†С–С— (ace, 2, 3, 4, 5)
     }
 
     std::sort(plc_values.begin(), plc_values.end());
 
-    // Перевірка, чи є послідовність п'яти карт 
+    // РџРµСЂРµРІС–СЂРєР°, С‡Рё С” РїРѕСЃР»С–РґРѕРІРЅС–СЃС‚СЊ Рї'СЏС‚Рё РєР°СЂС‚
     bool comb_found = false;
     for (size_t i = 0; i < plc_values.size() - 4; ++i) {
         if (plc_values[i] == plc_values[i + 1] - 1 && plc_values[i + 1] == plc_values[i + 2] - 1 && plc_values[i + 2] == plc_values[i + 3] - 1 && plc_values[i + 3] == plc_values[i + 4] - 1) {
@@ -249,7 +249,7 @@ bool CombinationSearcher::isThreeOfAKind() {
     unordered_map<string, int> value_count;
     valueCounter(value_count);
 
-    // Перевірка, чи є три карти одного рангу
+    // РџРµСЂРµРІС–СЂРєР°, С‡Рё С” С‚СЂРё РєР°СЂС‚Рё РѕРґРЅРѕРіРѕ СЂР°РЅРіСѓ
     for (const auto& pair : value_count) {
         if (pair.second == 3) {
             comb_score = values_order[pair.first] * 3;
@@ -263,7 +263,7 @@ bool CombinationSearcher::isTwoPair() {
     unordered_map<string, int> value_count;
     valueCounter(value_count);
 
-    // Розрахунок кількості пар
+    // Р РѕР·СЂР°С…СѓРЅРѕРє РєС–Р»СЊРєРѕСЃС‚С– РїР°СЂ
     vector<string> pairs;
     for (const auto& pair : value_count) {
         if (pair.second == 2) {
@@ -271,13 +271,13 @@ bool CombinationSearcher::isTwoPair() {
         }
     }
 
-    // Перевірка на дві пари
+    // РџРµСЂРµРІС–СЂРєР° РЅР° РґРІС– РїР°СЂРё
     if (pairs.size() == 2) {
         comb_score = values_order[pairs[0]] * 2;
         comb_score += values_order[pairs[1]] * 2;
         return true;
     }
-    // Якщо є три пари - знаходить дві з найзначущими рангами
+    // РЇРєС‰Рѕ С” С‚СЂРё РїР°СЂРё - Р·РЅР°С…РѕРґРёС‚СЊ РґРІС– Р· РЅР°Р№Р·РЅР°С‡СѓС‰РёРјРё СЂР°РЅРіР°РјРё
     else if (pairs.size() == 3) {
         vector<int> temp = {
             values_order[pairs[0]], values_order[pairs[1]], values_order[pairs[2]]
@@ -294,7 +294,7 @@ bool CombinationSearcher::isPair() {
     unordered_map<string, int> value_count;
     valueCounter(value_count);
 
-    // Перевірка, чи є пара в value_count
+    // РџРµСЂРµРІС–СЂРєР°, С‡Рё С” РїР°СЂР° РІ value_count
     for (const auto& pair : value_count) {
         if (pair.second == 2) {
             comb_score = values_order[pair.first] * 2;
@@ -305,7 +305,7 @@ bool CombinationSearcher::isPair() {
 }
 
 string CombinationSearcher::highCard() {
-    // Знаходить найзначущу карту
+    // Р—РЅР°С…РѕРґРёС‚СЊ РЅР°Р№Р·РЅР°С‡СѓС‰Сѓ РєР°СЂС‚Сѓ
     int biggest_score = 0;
     for (const auto& card : playing_cards) {
         int score = values_order[card.getValue()];
@@ -318,14 +318,14 @@ string CombinationSearcher::highCard() {
     return "High";
 }
 
-// Функція для підрахунку кількості карт одного рангу в playing_cards
+// Р¤СѓРЅРєС†С–СЏ РґР»СЏ РїС–РґСЂР°С…СѓРЅРєСѓ РєС–Р»СЊРєРѕСЃС‚С– РєР°СЂС‚ РѕРґРЅРѕРіРѕ СЂР°РЅРіСѓ РІ playing_cards
 void CombinationSearcher::valueCounter(unordered_map<string, int>& value_count) {
     for (const auto& card : playing_cards) {
         value_count[card.getValue()] += 1;
     }
 }
 
-// Функція для розділення карт в playing_cards по масті
+// Р¤СѓРЅРєС†С–СЏ РґР»СЏ СЂРѕР·РґС–Р»РµРЅРЅСЏ РєР°СЂС‚ РІ playing_cards РїРѕ РјР°СЃС‚С–
 void CombinationSearcher::divideBySuit(unordered_map<string, vector<int>>& suit_map) {
     for (const auto& card : playing_cards) {
         suit_map[card.getSuit()].push_back(values_order[card.getValue()]);

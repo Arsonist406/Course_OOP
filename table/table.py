@@ -396,7 +396,7 @@ class Table:
 
         pygame.display.flip()
 
-        # Затримка на 5 секунд
+        # Затримка на 7 секунд
         clock = pygame.time.Clock()
         start_time = pygame.time.get_ticks()
         while pygame.time.get_ticks() - start_time < 7000:

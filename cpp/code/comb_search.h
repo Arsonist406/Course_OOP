@@ -51,10 +51,10 @@ protected:
 
     string highCard();
 
-    // Функція для підрахунку кількості карт одного рангу в playing_cards
+    // Р¤СѓРЅРєС†С–СЏ РґР»СЏ РїС–РґСЂР°С…СѓРЅРєСѓ РєС–Р»СЊРєРѕСЃС‚С– РєР°СЂС‚ РѕРґРЅРѕРіРѕ СЂР°РЅРіСѓ РІ playing_cards
     void valueCounter(unordered_map<string, int>& value_count);
 
-    // Функція для розділення карт в playing_cards по масті
+    // Р¤СѓРЅРєС†С–СЏ РґР»СЏ СЂРѕР·РґС–Р»РµРЅРЅСЏ РєР°СЂС‚ РІ playing_cards РїРѕ РјР°СЃС‚С–
     void divideBySuit(unordered_map<string, vector<int>>& suit_map);
 
 };

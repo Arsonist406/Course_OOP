@@ -2,8 +2,6 @@ import pygame
 from bank.bank import Bank
 from cards.card import Card
 from deck.deck import Deck
-from functions.combination_searchers.combination_searcher import Combination_Searcher
-from functions.combination_searchers.table_combination_searcher import Table_Combination_Searcher
 from functions.commands.bet_n_rais_command import BetNRaisCommand
 from functions.commands.callCommand import CallCommand
 from functions.commands.foldCommand import FoldCommand
@@ -67,18 +65,7 @@ class Game:
         lib.CombinationSearcher_destroy.argtypes = [ctypes.c_void_p]
         lib.CombinationSearcher_destroy.restype = None
 
-        lib.free_string.argtypes = [ctypes.c_char_p]
-        lib.free_string.restype = None
-
     def found_winner(self, list_of_potential_winners):
-        func = Table_Combination_Searcher(self.table_cards)
-        table_comb = func.execute()
-        table_comb_score = func.getCombScore()
-
-        # Перевіряємо на ПОВНУ нічию
-        if table_comb == "Royal flush":
-            return list_of_potential_winners
-
         # Ініціалізація інтерфейсу для взаємодії з класом CombinationSearcher
         self.c_interface_init()
 
@@ -86,6 +73,16 @@ class Game:
         table_cards_array = self.py_list_to_c_array_convert(self.table_cards)
         # Створення вказівника на table_cards_array
         table_cards_ptr = ctypes.cast(table_cards_array, ctypes.POINTER(CtypesCard))
+
+        table_comb_searcher = lib.CombinationSearcher_create(table_cards_ptr, len(table_cards_array), None, 0)
+        try:
+            table_comb_bytes = lib.CombinationSearcher_execute(table_comb_searcher)
+            table_comb = table_comb_bytes.decode('utf-8')
+
+            table_comb_score = lib.CombinationSearcher_getCombScore(table_comb_searcher)
+        finally:
+            # Звільнення пам'яті
+            lib.CombinationSearcher_destroy(table_comb_searcher)
 
         hash_player_comb = {}
         for player in list_of_potential_winners:
@@ -105,14 +102,6 @@ class Game:
             finally:
                 # Звільнення пам'яті
                 lib.CombinationSearcher_destroy(comb_searcher)
-
-        hash_player_comb = {}
-        for player in list_of_potential_winners:
-            func = Combination_Searcher(self.table_cards, player.getHand())
-            player_comb = func.execute()
-            player_comb_score = func.getCombScore()
-
-            hash_player_comb[player] = (player_comb, player_comb_score)
 
         potential_draw = 0
         potential_draw_with_need_of_find_high_card = 0

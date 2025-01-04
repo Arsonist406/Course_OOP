@@ -1,6 +1,6 @@
 #include "card.h"
 
-// Реалізація методів класу Card
+// Р РµР°Р»С–Р·Р°С†С–СЏ РјРµС‚РѕРґС–РІ РєР»Р°СЃСѓ Card
 Card::Card(const string& suit, const string& value) : suit(suit), value(value) {}
 
 string Card::getSuit() const {
