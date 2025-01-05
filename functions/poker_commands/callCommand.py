@@ -1,12 +1,9 @@
-from functions.commands.command import Command
+from functions.poker_commands.baseCommand import BaseCommand
 
-class CallCommand(Command):
+class CallCommand(BaseCommand):
     def __init__(self, bank, player, biggest_bet, hash_player_bet):
-        super().__init__()
-        self.bank = bank
-        self.player = player
+        super().__init__(bank, player, hash_player_bet)
         self.biggest_bet = biggest_bet
-        self.hash_player_bet = hash_player_bet
 
     def execute(self):
         self.bank.setBank(self.bank.getBank() + self.biggest_bet - int(self.hash_player_bet[self.player]))

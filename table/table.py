@@ -10,12 +10,12 @@ from animations.cardRotation import CardRotation
 from animations.shuffleDeck import ShuffleDeck
 from animations.twoCardsMoving import TwoCardsMoving
 from functions.blitOverlay import BlitOverlay
-from functions.commands.bet_n_rais_command import BetNRaisCommand
-from functions.commands.callCommand import CallCommand
-from functions.commands.checkCommand import CheckCommand
-from functions.commands.foldCommand import FoldCommand
-from functions.drawButton import DrawButton
-from functions.drawText import DrawText
+from functions.poker_commands.bet_n_rais_command import BetNRaisCommand
+from functions.poker_commands.callCommand import CallCommand
+from functions.poker_commands.checkCommand import CheckCommand
+from functions.poker_commands.foldCommand import FoldCommand
+from functions.draw_func.drawButton import DrawButton
+from functions.draw_func.drawText import DrawText
 from functions.loadImage import LoadImage
 
 
@@ -152,7 +152,7 @@ class Table:
 
         pygame.draw.rect(self.screen, self.GRAY, ((x, y), (150, 30)))
         func = DrawText(player.getName(), self.font, self.WHITE, self.screen, x + 5, y + 5)
-        func.execute()
+        func.draw()
 
     def print_player_chips(self, player):
         coord1, coord2 = self.hash_player_pos[player]
@@ -173,7 +173,7 @@ class Table:
 
         pygame.draw.rect(self.screen, self.GRAY, ((x, y), (150, 30)))
         func = DrawText(str(player.getChips()) + " $", self.font, self.WHITE, self.screen, x + 5, y + 5)
-        func.execute()
+        func.draw()
 
     def print_player_info(self, player):
         self.print_player_name(player)
@@ -218,28 +218,28 @@ class Table:
 
     def draw_active_zones(self, player, input_box_red_alpha):
         RED = (211, 47, 47)
-        func = DrawButton(self.screen, self.button_font, "Fold", self.fold_button_rect, RED, self.WHITE)
-        func.execute()
+        func = DrawButton(self.screen, self.button_font, "Fold", self.fold_button_rect, RED, self.WHITE, 2, 10)
+        func.draw()
 
         BLUE = (58, 164, 197)
         if self.biggest_bet == 0:
             self.bet_n_rais_button_text = "Bet"
-            func = DrawButton(self.screen, self.button_font, self.bet_n_rais_button_text, self.bet_n_rais_button_rect, BLUE, self.WHITE)
-            func.execute()
+            func = DrawButton(self.screen, self.button_font, self.bet_n_rais_button_text, self.bet_n_rais_button_rect, BLUE, self.WHITE, 2, 10)
+            func.draw()
         else:
             self.bet_n_rais_button_text = "Rais"
-            func = DrawButton(self.screen, self.button_font, self.bet_n_rais_button_text, self.bet_n_rais_button_rect, BLUE, self.WHITE)
-            func.execute()
+            func = DrawButton(self.screen, self.button_font, self.bet_n_rais_button_text, self.bet_n_rais_button_rect, BLUE, self.WHITE, 2, 10)
+            func.draw()
 
         GREEN = (67, 160, 71)
         if self.biggest_bet == 0 or self.biggest_bet == int(self.hash_player_bet[player]):
             self.check_n_call_button_text = "Check"
-            func = DrawButton(self.screen, self.button_font, self.check_n_call_button_text, self.check_n_call_button_rect, GREEN, self.WHITE)
-            func.execute()
+            func = DrawButton(self.screen, self.button_font, self.check_n_call_button_text, self.check_n_call_button_rect, GREEN, self.WHITE, 2, 10)
+            func.draw()
         else:
             self.check_n_call_button_text = "Call"
-            func = DrawButton(self.screen, self.button_font, self.check_n_call_button_text, self.check_n_call_button_rect, GREEN, self.WHITE)
-            func.execute()
+            func = DrawButton(self.screen, self.button_font, self.check_n_call_button_text, self.check_n_call_button_rect, GREEN, self.WHITE, 2, 10)
+            func.draw()
 
         self.screen.blit(self.up_button_image, self.up_button_rect)
         self.screen.blit(self.down_button_image, self.down_button_rect)
@@ -251,7 +251,7 @@ class Table:
         pygame.draw.rect(self.screen, self.GRAY, self.input_box_rect, border_radius=5)
         func = DrawText(self.player_bet, self.font, self.BLACK, self.screen,
                         self.input_box_rect.x + 10, self.input_box_rect.y + 10)
-        func.execute()
+        func.draw()
 
         # Малюємо на місці поля для введення червоний прямокутник з заданим рівним прозорості
         input_box_with_alpha = pygame.Surface((self.input_box_rect.width, self.input_box_rect.height), pygame.SRCALPHA)
@@ -340,7 +340,7 @@ class Table:
         text = "Bank: " + str(self.bank.getBank()) + " $"
         font = pygame.font.Font(None, 40)
         func = DrawText(text, font, self.WHITE, self.screen, x + 5, y + 5)
-        func.execute()
+        func.draw()
 
         font = pygame.font.Font(None, 36)
         for player, i in zip(self.players, range(len(self.players))):
@@ -348,12 +348,12 @@ class Table:
                 pygame.draw.rect(self.screen, self.GRAY, ((x, y + 43 + 40 * i), (300, 40)))
                 text = player.getName() + ": " + self.hash_player_bet[player] + " $"
                 func = DrawText(text, font, self.WHITE, self.screen, x + 5, y + 48 + 40 * i)
-                func.execute()
+                func.draw()
             else:
                 pygame.draw.rect(self.screen, self.GRAY, ((x, y + 43 + 40 * i), (300, 40)))
                 text = player.getName() + ": " + "Fold"
                 func = DrawText(text, font, self.WHITE, self.screen, x + 5, y + 48 + 40 * i)
-                func.execute()
+                func.draw()
 
     def show_winner_banner(self, winners, comb):
         pygame.image.save(self.screen, "icons/backgrounds/game/table_with_players_cards.png")
@@ -400,10 +400,10 @@ class Table:
 
         pygame.display.flip()
 
-        # Затримка на 7 секунд
+        # Затримка на 5 секунд
         clock = pygame.time.Clock()
         start_time = pygame.time.get_ticks()
-        while pygame.time.get_ticks() - start_time < 7000:
+        while pygame.time.get_ticks() - start_time < 5000:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -448,6 +448,16 @@ class Table:
 
             pygame.time.delay(20)
             pygame.display.flip()
+
+        # Затримка на 5 секунд
+        clock = pygame.time.Clock()
+        start_time = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - start_time < 5000:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+            clock.tick(60)
 
     def open_player_cards(self, player):
         animation = CardRotation(self.screen, self.hash_card_image[player.getHand()[0]], self.card_back_image,
@@ -609,7 +619,7 @@ class Table:
                 draw_fade_overlay_rect(self.screen, fade_overlay_coord, 13)
 
                 func = DrawText(text, self.font, LIGHT_GRAY, self.screen, 407, 347)
-                func.execute()
+                func.draw()
 
                 self.screen.blit(clippy_image, (980, 210))
                 self.screen.blit(dialogue_bubble_image, (800, 40))
@@ -618,7 +628,7 @@ class Table:
                 i = 0
                 for chunk in chunks:
                     func = DrawText(chunk, font, self.BLACK, self.screen, 829, 70 + i * 15)
-                    func.execute()
+                    func.draw()
                     i += 1
 
                 pygame.display.flip()
@@ -699,7 +709,7 @@ class Table:
 
                     elif self.check_n_call_button_rect.collidepoint(event.pos):
                         if self.check_n_call_button_text == "Check":
-                            command = CheckCommand(self.hash_player_bet, player)
+                            command = CheckCommand(player, self.hash_player_bet)
                             running = False
 
                         elif self.check_n_call_button_text == "Call":

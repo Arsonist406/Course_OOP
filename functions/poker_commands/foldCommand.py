@@ -1,12 +1,12 @@
 import pygame
-from functions.commands.command import Command
+from functions.poker_commands.baseCommand import BaseCommand
 from animations.twoCardsMoving import TwoCardsMoving
 from functions.blitOverlay import BlitOverlay
 from functions.loadImage import LoadImage
 
-class FoldCommand(Command):
+class FoldCommand(BaseCommand):
     def __init__(self, screen, table_image, card_back_image, hash_player_pos, deck_pos, player):
-        super().__init__()
+        super().__init__(player=player)
         self.screen = screen
         self.table_image = table_image
         self.card_back_image = card_back_image
@@ -14,7 +14,6 @@ class FoldCommand(Command):
         self.coord1, self.coord2 = self.player_pos
         self.card_ang = 0
         self.deck_pos = deck_pos
-        self.player = player
 
     def execute(self):
         self.player.setIs_active(False)

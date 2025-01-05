@@ -2,20 +2,16 @@ import pygame
 from bank.bank import Bank
 from cards.card import Card
 from deck.deck import Deck
-from functions.commands.bet_n_rais_command import BetNRaisCommand
-from functions.commands.callCommand import CallCommand
-from functions.commands.foldCommand import FoldCommand
 from table.table import Table
 from players.player import Player
 
 import ctypes
-from ctypes import POINTER, c_void_p, c_int, c_char_p
 lib = ctypes.CDLL('cpp/lib/comb_calculator.dll')
 class CtypesCard(ctypes.Structure):
     _fields_ = [("suit", ctypes.c_char_p), ("value", ctypes.c_char_p)]
 
 class Game:
-    def __init__(self, screen, amount_of_players, names):
+    def __init__(self, screen, amount_of_players, names, start_chips, show_start_tutorial):
         self.screen = screen
         pygame.display.set_caption("Гра")
 
@@ -24,7 +20,7 @@ class Game:
         self.hash_player_bet = {}
         i = 0
         while i != amount_of_players:
-            self.players.append(Player(self.names[i], (Card(None, None), Card(None, None)), 1000000))
+            self.players.append(Player(self.names[i], (Card(None, None), Card(None, None)), start_chips))
             i += 1
 
         self.players_for_game = self.players
@@ -35,6 +31,8 @@ class Game:
         self.table_cards = [None] * 5
         self.playing = True
         self.winner_comb = ""
+
+        self.show_start_tutorial = show_start_tutorial
 
         self.table = Table(self.screen, self.players_for_game, self.bank, self.deck, self.table_cards, self.hash_player_bet)
 
@@ -179,6 +177,10 @@ class Game:
             self.table.card_deal_for_players()
             self.table.board_deal()
 
+            if self.show_start_tutorial:
+                self.table.show_tutorial()
+                self.show_start_tutorial = False
+
             i = 0
             for player in self.players:
                 first = self.deck.getCards()[i]
@@ -262,8 +264,8 @@ class Game:
                                 command = self.table.turn(player)
                                 if command == "Exit":
                                     break
-
-                                command.execute()
+                                else:
+                                    command.execute()
 
                                 self.table.print_bank()
                                 self.table.print_player_info(player)
