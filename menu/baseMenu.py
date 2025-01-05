@@ -1,6 +1,9 @@
-import pygame
 from abc import ABC, abstractmethod
+
+import pygame
+
 from functions.loadImage import LoadImage
+
 
 class BaseMenu(ABC):
     def __init__(self, background_image_path, screen=None):

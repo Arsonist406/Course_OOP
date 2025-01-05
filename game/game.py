@@ -1,11 +1,13 @@
+import ctypes
+
 import pygame
+
 from bank.bank import Bank
 from cards.card import Card
 from deck.deck import Deck
-from table.table import Table
 from players.player import Player
+from table.table import Table
 
-import ctypes
 lib = ctypes.CDLL('cpp/lib/comb_calculator.dll')
 class CtypesCard(ctypes.Structure):
     _fields_ = [("suit", ctypes.c_char_p), ("value", ctypes.c_char_p)]

@@ -1,5 +1,7 @@
-import pygame
 import sys
+
+import pygame
+
 
 class CardMoving:
     def __init__(self, screen, start_pos, end_pos, angle, table_image, card_image):

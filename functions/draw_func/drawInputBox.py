@@ -1,6 +1,8 @@
 import pygame
+
 from functions.draw_func.baseDrawable import Drawable
 from functions.draw_func.drawText import DrawText
+
 
 class DrawInputBox(Drawable):
     def __init__(self, screen, rect, font, field_color, text_color, border_color, text=""):

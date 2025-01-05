@@ -1,22 +1,24 @@
-import sys
 import math
-import pygame
+import sys
 import threading
 import tkinter as tk
+
+import pygame
 from PIL import Image, ImageTk
 from pygame import transform
+
 from animations.cardMoving import CardMoving
 from animations.cardRotation import CardRotation
 from animations.shuffleDeck import ShuffleDeck
 from animations.twoCardsMoving import TwoCardsMoving
 from functions.blitOverlay import BlitOverlay
+from functions.draw_func.drawButton import DrawButton
+from functions.draw_func.drawText import DrawText
+from functions.loadImage import LoadImage
 from functions.poker_commands.bet_n_rais_command import BetNRaisCommand
 from functions.poker_commands.callCommand import CallCommand
 from functions.poker_commands.checkCommand import CheckCommand
 from functions.poker_commands.foldCommand import FoldCommand
-from functions.draw_func.drawButton import DrawButton
-from functions.draw_func.drawText import DrawText
-from functions.loadImage import LoadImage
 
 
 class Table:

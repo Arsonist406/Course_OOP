@@ -1,11 +1,14 @@
 import sys
+
 import pygame
+
 from functions.draw_func.drawButton import DrawButton
 from functions.draw_func.drawCheckBox import DrawCheckbox
 from functions.draw_func.drawInputBox import DrawInputBox
 from functions.draw_func.drawText import DrawText
 from game.game import Game
 from menu.baseMenu import BaseMenu
+
 
 class SetCurrentGameSettings(BaseMenu):
     def __init__(self, screen, amount_of_players):

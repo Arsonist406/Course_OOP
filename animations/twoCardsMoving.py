@@ -1,5 +1,7 @@
 import pygame
+
 from animations.cardMoving import CardMoving
+
 
 class TwoCardsMoving:
     def __init__(self, screen,  table_image, card_back_image, player_pos, discard_deck_pos):
