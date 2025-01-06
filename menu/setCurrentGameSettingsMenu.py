@@ -123,8 +123,7 @@ class SetCurrentGameSettings(BaseMenu):
 
         chips_input_box_red_alpha = 0
 
-        running = True
-        while running:
+        while True:
             self.draw_input_boxes(chips_input_box_red_alpha)
             self.draw_check_box()
 

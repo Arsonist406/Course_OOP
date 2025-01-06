@@ -1,6 +1,6 @@
-from functions.draw_func.baseDrawable import Drawable
+from functions.draw_func.baseDrawable import BaseDrawable
 
-class DrawText(Drawable):
+class DrawText(BaseDrawable):
     def __init__(self, text, font, text_color, screen, x, y):
         super().__init__(screen, text=text, font=font, text_color=text_color)
         self.x = x

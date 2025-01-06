@@ -35,8 +35,7 @@ class StartMenu(BaseMenu):
         self.draw_buttons()
 
         flag = ""
-        running = True
-        while running:
+        while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -48,13 +47,13 @@ class StartMenu(BaseMenu):
                         flag = menu.execute()
 
                     elif self.exit_button.collidepoint(event.pos):
+                        pygame.quit()
                         return
 
-            if flag == "back":
+            if flag != "":
                 self.screen.blit(self.background_image, (0, 0))
                 self.draw_text()
                 self.draw_buttons()
                 flag = ""
 
             pygame.display.flip()
-        pygame.quit()

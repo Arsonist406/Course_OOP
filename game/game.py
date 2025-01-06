@@ -2,10 +2,10 @@ import ctypes
 
 import pygame
 
-from bank.bank import Bank
-from cards.card import Card
-from deck.deck import Deck
-from players.player import Player
+from clases.bank import Bank
+from clases.card import Card
+from clases.deck import Deck
+from clases.player import Player
 from table.table import Table
 
 lib = ctypes.CDLL('cpp/lib/comb_calculator.dll')
@@ -33,7 +33,7 @@ class Game:
         self.table_cards = [None] * 5
         self.playing = True
         self.winner_comb = ""
-
+        self.start_chips = start_chips
         self.show_start_tutorial = show_start_tutorial
 
         self.table = Table(self.screen, self.players_for_game, self.bank, self.deck, self.table_cards, self.hash_player_bet)
@@ -163,11 +163,36 @@ class Game:
         self.winner_comb = greatest_comb_str
         return list_of_winners
 
+    def set_biggest_bet(self):
+        for value in self.hash_player_bet.values():
+            if value == "All in" or value == "Fold":
+                continue
+            else:
+                int_value = int(value)
+                if self.biggest_bet is None or int_value > self.biggest_bet:
+                    self.biggest_bet = int_value
+
     def execute(self):
         command = None
+        result = None
         self.table.create_table()
 
         while self.playing:
+            for player in self.players:
+                if player.getChips() == 0:
+                    result = self.table.show_message_banner()
+                    if result == "Add":
+                        for player2 in self.players:
+                            if player2.getChips() == 0:
+                                player2.setChips(self.start_chips)
+                        break
+
+                    elif result == "Exit":
+                        break
+
+            if result == "Exit":
+                break
+
             self.deck.shuffleCards()
 
             for player in self.players:
@@ -176,6 +201,7 @@ class Game:
 
             pygame.display.update()
 
+            self.table.shuffle_deck()
             self.table.card_deal_for_players()
             self.table.board_deal()
 
@@ -207,26 +233,18 @@ class Game:
                     self.hash_player_bet[player] = "0"
                     self.table.print_player_info(player)
 
-                if stage == "Pre-flop":
-                    print("Pre-flop")
-
-                elif stage == "Flop":
-                    print("Flop")
+                if stage == "Flop":
                     self.table.open_board_card(0)
                     self.table.open_board_card(1)
                     self.table.open_board_card(2)
 
                 elif stage == "Turn":
-                    print("Turn")
                     self.table.open_board_card(3)
 
                 elif stage == "River":
-                    print("River")
                     self.table.open_board_card(4)
 
                 elif stage == "Showdown":
-                    print("Showdown")
-
                     list_of_potential_winners = []
                     for player in self.players:
                         if player.getIs_active():
@@ -261,9 +279,9 @@ class Game:
                                 self.table.print_player_info(player)
                                 self.table.draw_nimbus(player)
 
-                                self.biggest_bet = max(int(value) for value in self.hash_player_bet.values())
+                                self.set_biggest_bet()
 
-                                command = self.table.turn(player)
+                                command = self.table.turn(player, self.biggest_bet)
                                 if command == "Exit":
                                     break
                                 else:
@@ -271,7 +289,8 @@ class Game:
 
                                 self.table.print_bank()
                                 self.table.print_player_info(player)
-                                self.biggest_bet = max(int(value) for value in self.hash_player_bet.values())
+
+                                self.set_biggest_bet()
 
                     if command == "Exit":
                         break
@@ -295,8 +314,19 @@ class Game:
                             if player.getIs_active():
                                 hash_player_bet[player] = self.hash_player_bet[player]
 
-                        values = [int(value) for value in hash_player_bet.values()]
-                        all_equal = all(value == values[0] for value in values)
+                        values = list(hash_player_bet.values())
+                        all_equal = True
+                        for index, value in enumerate(values):
+                            if value.isdigit():
+                                break
+
+                        # Перевірка на рівність всіх елементів
+                        for value in values[1:]:
+                            if value == "All in" or value == "Fold":
+                                continue
+                            elif value != values[index]:
+                                all_equal = False
+                                break
 
                         # Якщо не у всіх ставки рівні - продовжуємо торги
                         if all_equal:

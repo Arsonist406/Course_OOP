@@ -1,14 +1,14 @@
 import pygame
 
-from animations.twoCardsMoving import TwoCardsMoving
+from functions.animations.twoCardsMoving import TwoCardsMoving
 from functions.blitOverlay import BlitOverlay
 from functions.loadImage import LoadImage
 from functions.poker_commands.baseCommand import BaseCommand
 
 
 class FoldCommand(BaseCommand):
-    def __init__(self, screen, table_image, card_back_image, hash_player_pos, deck_pos, player):
-        super().__init__(player=player)
+    def __init__(self, screen, table_image, card_back_image, hash_player_pos, deck_pos, player, hash_player_bet):
+        super().__init__(player=player, hash_player_bet=hash_player_bet)
         self.screen = screen
         self.table_image = table_image
         self.card_back_image = card_back_image
@@ -19,6 +19,8 @@ class FoldCommand(BaseCommand):
 
     def execute(self):
         self.player.setIs_active(False)
+
+        self.hash_player_bet[self.player] = "Fold"
 
         func = BlitOverlay(self.screen, self.coord1)
         func.execute()

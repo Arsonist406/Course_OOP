@@ -7,10 +7,10 @@ import pygame
 from PIL import Image, ImageTk
 from pygame import transform
 
-from animations.cardMoving import CardMoving
-from animations.cardRotation import CardRotation
-from animations.shuffleDeck import ShuffleDeck
-from animations.twoCardsMoving import TwoCardsMoving
+from functions.animations.cardMoving import CardMoving
+from functions.animations.cardRotation import CardRotation
+from functions.animations.shuffleDeck import ShuffleDeck
+from functions.animations.twoCardsMoving import TwoCardsMoving
 from functions.blitOverlay import BlitOverlay
 from functions.draw_func.drawButton import DrawButton
 from functions.draw_func.drawText import DrawText
@@ -19,6 +19,7 @@ from functions.poker_commands.bet_n_rais_command import BetNRaisCommand
 from functions.poker_commands.callCommand import CallCommand
 from functions.poker_commands.checkCommand import CheckCommand
 from functions.poker_commands.foldCommand import FoldCommand
+from functions.poker_commands.skipCommand import SkipCommand
 
 
 class Table:
@@ -35,10 +36,11 @@ class Table:
         self.card_back_image = func.execute()
 
         self.BLACK = (0, 0, 0)
-        self.WHITE = (255, 255, 255)
         self.GRAY = (127, 127, 127)
+        self.WHITE = (255, 255, 255)
         self.font = pygame.font.Font(None, 36)
         self.button_font = pygame.font.SysFont('verdana', 36)
+        self.small_button_font = pygame.font.SysFont('verdana', 16)
 
         # Активні поля
         self.view_card_rect = None
@@ -47,8 +49,12 @@ class Table:
         self.check_n_call_button_rect = pygame.Rect(390, 612, 140, 70)
         self.input_box_rect = pygame.Rect(230, 515, 120, 40)
 
+        self.all_in = pygame.Rect(150, 465, 60, 40)
+        self.bet_1d2_of_bank = pygame.Rect(150, 515, 60, 40)
+        self.bet_1d3_of_bank = pygame.Rect(150, 565, 60, 40)
+
         self.bet_n_rais_button_text = None
-        self.check_n_call_button_text = None
+        self.check_call_skip_button_text = None
 
         self.view_card_status = "Back"
         self.active_box = False
@@ -114,24 +120,6 @@ class Table:
         self.table_cards = table_cards
         self.hash_player_bet = hash_player_bet
 
-    def get_table_image(self):
-        return self.table_image
-
-    def get_card_back_image(self):
-        return self.card_back_image
-
-    def get_hash_player_pos(self):
-        return self.hash_player_pos
-
-    def get_hash_player_ang(self):
-        return self.hash_player_ang
-
-    def get_deck_pos(self):
-        return self.deck_pos
-
-    def get_player_bet(self):
-        return self.player_bet
-
     def create_table(self):
         self.screen.blit(self.table_image, (0, 0))
 
@@ -182,8 +170,7 @@ class Table:
         self.print_player_chips(player)
 
         pygame.image.save(self.screen, "icons/backgrounds/game/table_with_players_info.png")
-        func = LoadImage("icons/backgrounds/game/table_with_players_info.png",
-                         (1280, 720))
+        func = LoadImage("icons/backgrounds/game/table_with_players_info.png",(1280, 720))
         self.table_image = func.execute()
 
     def card_deal_for_players(self):
@@ -220,28 +207,60 @@ class Table:
 
     def draw_active_zones(self, player, input_box_red_alpha):
         RED = (211, 47, 47)
-        func = DrawButton(self.screen, self.button_font, "Fold", self.fold_button_rect, RED, self.WHITE, 2, 10)
+        func = DrawButton(self.screen, self.button_font, "Fold", self.fold_button_rect,
+                          RED, self.WHITE, 2, 10)
         func.draw()
 
-        BLUE = (58, 164, 197)
+
+        if player.getChips() < self.biggest_bet or self.hash_player_bet[player] == "All in" or player.getChips() == 0:
+            button_rect_color = self.GRAY
+            button_text_color = self.GRAY
+        else:
+            button_rect_color = (58, 164, 197) # Blue
+            button_text_color = self.WHITE
+
         if self.biggest_bet == 0:
             self.bet_n_rais_button_text = "Bet"
-            func = DrawButton(self.screen, self.button_font, self.bet_n_rais_button_text, self.bet_n_rais_button_rect, BLUE, self.WHITE, 2, 10)
+            func = DrawButton(self.screen, self.button_font, self.bet_n_rais_button_text,
+                              self.bet_n_rais_button_rect, button_rect_color, button_text_color, 2, 10)
             func.draw()
         else:
             self.bet_n_rais_button_text = "Rais"
-            func = DrawButton(self.screen, self.button_font, self.bet_n_rais_button_text, self.bet_n_rais_button_rect, BLUE, self.WHITE, 2, 10)
+            func = DrawButton(self.screen, self.button_font, self.bet_n_rais_button_text,
+                              self.bet_n_rais_button_rect, button_rect_color, button_text_color, 2, 10)
             func.draw()
 
-        GREEN = (67, 160, 71)
-        if self.biggest_bet == 0 or self.biggest_bet == int(self.hash_player_bet[player]):
-            self.check_n_call_button_text = "Check"
-            func = DrawButton(self.screen, self.button_font, self.check_n_call_button_text, self.check_n_call_button_rect, GREEN, self.WHITE, 2, 10)
+
+        if player.getChips() < self.biggest_bet and player.getChips() != 0:
+            button_rect_color = (218, 165, 32) # Gold
+        else:
+            button_rect_color = (67, 160, 71) # Green
+
+        if player.getChips() == 0:
+            self.check_call_skip_button_text = "Skip"
+            func = DrawButton(self.screen, self.button_font, self.check_call_skip_button_text,
+                              self.check_n_call_button_rect, button_rect_color, self.WHITE, 2, 10)
+            func.draw()
+        elif self.biggest_bet == 0 or self.biggest_bet == int(self.hash_player_bet[player]):
+            self.check_call_skip_button_text = "Check"
+            func = DrawButton(self.screen, self.button_font, self.check_call_skip_button_text,
+                              self.check_n_call_button_rect, button_rect_color, self.WHITE, 2, 10)
             func.draw()
         else:
-            self.check_n_call_button_text = "Call"
-            func = DrawButton(self.screen, self.button_font, self.check_n_call_button_text, self.check_n_call_button_rect, GREEN, self.WHITE, 2, 10)
+            self.check_call_skip_button_text = "Call"
+            func = DrawButton(self.screen, self.button_font, self.check_call_skip_button_text,
+                              self.check_n_call_button_rect, button_rect_color, self.WHITE, 2, 10)
             func.draw()
+
+        func = DrawButton(self.screen, self.small_button_font, "All in", self.all_in,
+                          self.GRAY, self.WHITE, 2, 10)
+        func.draw()
+        func = DrawButton(self.screen, self.small_button_font, " 1/2", self.bet_1d2_of_bank,
+                          self.GRAY, self.WHITE, 2, 10)
+        func.draw()
+        func = DrawButton(self.screen, self.small_button_font, " 1/3", self.bet_1d3_of_bank,
+                          self.GRAY, self.WHITE, 2, 10)
+        func.draw()
 
         self.screen.blit(self.up_button_image, self.up_button_rect)
         self.screen.blit(self.down_button_image, self.down_button_rect)
@@ -344,18 +363,79 @@ class Table:
         func = DrawText(text, font, self.WHITE, self.screen, x + 5, y + 5)
         func.draw()
 
-        font = pygame.font.Font(None, 36)
         for player, i in zip(self.players, range(len(self.players))):
-            if player.getIs_active():
-                pygame.draw.rect(self.screen, self.GRAY, ((x, y + 43 + 40 * i), (300, 40)))
-                text = player.getName() + ": " + self.hash_player_bet[player] + " $"
-                func = DrawText(text, font, self.WHITE, self.screen, x + 5, y + 48 + 40 * i)
-                func.draw()
-            else:
-                pygame.draw.rect(self.screen, self.GRAY, ((x, y + 43 + 40 * i), (300, 40)))
-                text = player.getName() + ": " + "Fold"
-                func = DrawText(text, font, self.WHITE, self.screen, x + 5, y + 48 + 40 * i)
-                func.draw()
+            pygame.draw.rect(self.screen, self.GRAY, ((x, y + 43 + 40 * i), (300, 40)))
+            text = player.getName() + ": " + self.hash_player_bet[player]
+            if self.hash_player_bet[player].isdigit():
+                text += " $"
+            func = DrawText(text, self.font, self.WHITE, self.screen, x + 5, y + 48 + 40 * i)
+            func.draw()
+
+    def show_message_banner(self):
+        pygame.image.save(self.screen, "icons/backgrounds/game/table_with_players_cards.png")
+        func = LoadImage("icons/backgrounds/game/table_with_players_cards.png", (1280, 720))
+        saved_table_image = func.execute()
+
+        func = LoadImage("icons/banners/message_banner.png", (477 * 1.2, 360 * 1.2))
+        message_banner_image = func.execute()
+
+        banner_x = 350
+        banner_y = 140
+        font = pygame.font.Font(None, 24)
+        title = pygame.font.Font(None, 50)
+
+        self.screen.blit(saved_table_image, (0, 0))
+
+        dark_surface = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
+        dark_surface.fill((0, 0, 0, 100))  # Чорний з потрібною прозорістю
+        self.screen.blit(dark_surface, (0, 0))
+
+        self.screen.blit(message_banner_image, (banner_x, banner_y))
+
+        text = "УВАГА"
+        func = DrawText(text, title, self.WHITE, self.screen, banner_x + 225, banner_y + 125)
+        func.draw()
+
+        text = "У когось закінчились фішки!"
+        func = DrawText(text, font, self.WHITE, self.screen, banner_x + 170, banner_y + 185)
+        func.draw()
+
+        text = "Ви можете закінчити гру, або додати йому фішок."
+        func = DrawText(text, font, self.WHITE, self.screen, banner_x + 89, banner_y + 210)
+        func.draw()
+
+        GREEN = (67, 160, 71)
+        RED = (211, 47, 47)
+        add_chips_button = pygame.Rect(660, 415, 70, 45)
+        exit_button = pygame.Rect(540, 415, 70, 45)
+
+        func = DrawButton(self.screen, self.font, "Add",
+                          add_chips_button, GREEN, self.WHITE, 0, 10)
+        func.draw()
+        func = DrawButton(self.screen, self.font, "Exit",
+                          exit_button, RED, self.WHITE, 0, 10)
+        func.draw()
+
+        command = None
+        running2 = True
+        while running2:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if add_chips_button.collidepoint(event.pos):
+                        command = "Add"
+                        running2 = False
+
+                    elif exit_button.collidepoint(event.pos):
+                        command = "Exit"
+                        running2 = False
+
+            pygame.display.update()
+
+        return command
 
     def show_winner_banner(self, winners, comb):
         pygame.image.save(self.screen, "icons/backgrounds/game/table_with_players_cards.png")
@@ -380,14 +460,14 @@ class Table:
             self.screen.blit(text_surface, text_rect)
 
             text_surface = minor_font.render(comb, True, self.BLACK)
-            text_rect = text_surface.get_rect(center=(1280 // 2, 720 // 2))
+            text_rect = text_surface.get_rect(center=(1280 // 2, 720 // 2 + 20))
             self.screen.blit(text_surface, text_rect)
 
             winners_name = ""
             for winner in winners:
                 winners_name += winner.getName() + "; "
             text_surface = minor_font.render(winners_name, True, self.BLACK)
-            text_rect = text_surface.get_rect(center=(1280 // 2, 720 // 2 + 40))
+            text_rect = text_surface.get_rect(center=(1280 // 2, 720 // 2 + 45))
             self.screen.blit(text_surface, text_rect)
         else:
             text_surface = main_font.render(winners[0].getName(), True, self.BLACK)
@@ -420,12 +500,12 @@ class Table:
             if len(winners) != 1:
                 text_surface = main_font.render("Tie", True, self.BLACK)
                 text_surface.set_alpha(i)
-                text_rect = text_surface.get_rect(center=(1280 // 2, 720 // 2 - 40))
+                text_rect = text_surface.get_rect(center=(1280 // 2, 720 // 2 - 20))
                 self.screen.blit(text_surface, text_rect)
 
                 text_surface = minor_font.render(comb, True, self.BLACK)
                 text_surface.set_alpha(i)
-                text_rect = text_surface.get_rect(center=(1280 // 2, 720 // 2))
+                text_rect = text_surface.get_rect(center=(1280 // 2, 720 // 2 + 20))
                 self.screen.blit(text_surface, text_rect)
 
                 winners_name = ""
@@ -433,7 +513,7 @@ class Table:
                     winners_name += winner.getName() + "; "
                 text_surface = minor_font.render(winners_name, True, self.BLACK)
                 text_surface.set_alpha(i)
-                text_rect = text_surface.get_rect(center=(1280 // 2, 720 // 2 - 40))
+                text_rect = text_surface.get_rect(center=(1280 // 2, 720 // 2 + 45))
                 self.screen.blit(text_surface, text_rect)
             else:
                 text_surface = main_font.render(winners[0].getName(), True, self.BLACK)
@@ -547,6 +627,7 @@ class Table:
             func = CardMoving(self.screen, pos, self.deck_pos, ang, self.table_image, self.card_back_image)
             func.execute()
 
+    def shuffle_deck(self):
         func = ShuffleDeck(self.screen, self.deck_pos, self.table_image, self.card_back_image)
         func.execute()
 
@@ -579,7 +660,7 @@ class Table:
         show_cards = pygame.Rect(569, 20, 135, 152)
         combinations = pygame.Rect(366, 511, 47, 47)
         fold = pygame.Rect(46, 610, 145, 75)
-        make_bet = pygame.Rect(230, 460, 120, 140)
+        make_bet = pygame.Rect(140, 460, 210, 140)
         bet_n_rais = pygame.Rect(216, 610, 145, 75)
         check_n_call = pygame.Rect(386, 610, 145, 75)
         bank = pygame.Rect(845, 470, 305, 211)
@@ -596,7 +677,7 @@ class Table:
             "Щоб побачити чи  приховати карти, натисніть на них": show_cards,
             "Натиснувши на    фішку можна поба-чити можливі покерні комбінації": combinations,
             "Щоб скинути картинатисніть на Fold": fold,
-            "Введіть ставку задопомогою стрілокчи клавіатури": make_bet,
+            "Введіть ставку задопомогою стрілокклавіатури та    кнопок. 1/2 - по-ловина банку 1/3 - третина банку": make_bet,
             bet_expl: bet_n_rais,
             check_expl: check_n_call,
             rais_expl: bet_n_rais,
@@ -641,11 +722,11 @@ class Table:
 
         self.screen.blit(saved_table_image, (0, 0))
 
-    def turn(self, player):
+    def turn(self, player, biggest_bet):
         self.set_view_card_rect(player)
 
         self.player_bet = self.hash_player_bet[player]
-        self.biggest_bet = max(int(value) for value in self.hash_player_bet.values())
+        self.biggest_bet = biggest_bet
 
         input_box_red_alpha = 0
         command = None
@@ -704,31 +785,45 @@ class Table:
                             else:
                                 self.player_bet = str(int(self.player_bet) - 10)
 
+                    elif self.all_in.collidepoint(event.pos):
+                        self.player_bet = str(player.getChips())
+
+                    elif self.bet_1d2_of_bank.collidepoint(event.pos):
+                        self.player_bet = str(int(self.bank.getBank() * 0.5))
+
+                    elif self.bet_1d3_of_bank.collidepoint(event.pos):
+                        self.player_bet = str(int(self.bank.getBank() * 0.333))
+
                     elif self.fold_button_rect.collidepoint(event.pos):
                         command = FoldCommand(self.screen, self.table_image, self.card_back_image,
-                                              self.hash_player_pos, self.deck_pos, player)
+                                              self.hash_player_pos, self.deck_pos, player, self.hash_player_bet)
                         running = False
 
                     elif self.check_n_call_button_rect.collidepoint(event.pos):
-                        if self.check_n_call_button_text == "Check":
+                        if self.check_call_skip_button_text == "Check":
                             command = CheckCommand(player, self.hash_player_bet)
                             running = False
 
-                        elif self.check_n_call_button_text == "Call":
+                        elif self.check_call_skip_button_text == "Call":
                             command = CallCommand(self.bank, player, self.biggest_bet, self.hash_player_bet)
                             running = False
 
-                    elif self.bet_n_rais_button_rect.collidepoint(event.pos):
-                        if self.bet_n_rais_button_text == "Bet":
-                            command = BetNRaisCommand(self.bank, player, self.player_bet, self.hash_player_bet)
+                        elif self.check_call_skip_button_text == "Skip":
+                            command = SkipCommand(player, self.hash_player_bet)
                             running = False
 
-                        elif self.bet_n_rais_button_text == "Rais":
-                            if int(self.player_bet) >= self.biggest_bet * 2:
+                    elif self.bet_n_rais_button_rect.collidepoint(event.pos):
+                        if player.getChips() > self.biggest_bet:
+                            if self.bet_n_rais_button_text == "Bet":
                                 command = BetNRaisCommand(self.bank, player, self.player_bet, self.hash_player_bet)
                                 running = False
-                            else:
-                                input_box_red_alpha = 148
+
+                            elif self.bet_n_rais_button_text == "Rais":
+                                if int(self.player_bet) >= self.biggest_bet * 2:
+                                    command = BetNRaisCommand(self.bank, player, self.player_bet, self.hash_player_bet)
+                                    running = False
+                                else:
+                                    input_box_red_alpha = 148
 
                 if event.type == pygame.KEYDOWN:
                     if self.active_box:

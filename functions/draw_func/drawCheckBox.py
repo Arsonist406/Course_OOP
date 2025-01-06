@@ -1,9 +1,9 @@
 import pygame
 
-from functions.draw_func.baseDrawable import Drawable
+from functions.draw_func.baseDrawable import BaseDrawable
 
 
-class DrawCheckbox(Drawable):
+class DrawCheckbox(BaseDrawable):
     def __init__(self, screen, rect, box_color, border_color, check_color, checkbox_checked):
         super().__init__(screen, rect=rect, rect_color=box_color, border_color=border_color)
         self.check_color = check_color

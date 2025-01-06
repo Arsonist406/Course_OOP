@@ -1,8 +1,11 @@
 import pygame
 
-class CardRotation:
+from functions.animations.baseAnimatiom import BaseAnimation
+
+
+class CardRotation(BaseAnimation):
     def __init__(self, screen, up_image, back_image, pos, angle):
-        self.screen = screen
+        super().__init__(screen, angle=angle)
         self.up_image = up_image
         self.back_image = back_image
         self.card_width = 100
@@ -10,7 +13,6 @@ class CardRotation:
         self.card_x, self.card_y = pos
         self.card_x -= self.card_width // 2
         self.card_y -= self.card_height // 2
-        self.angle = angle
 
     def execute(self):
         flipping = True
