@@ -1,6 +1,6 @@
 import pygame
 
-from functions.animations.baseAnimatiom import BaseAnimation
+from functions.animations.baseAnimation import BaseAnimation
 
 
 class CardRotation(BaseAnimation):

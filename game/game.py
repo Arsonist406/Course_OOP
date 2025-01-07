@@ -2,10 +2,10 @@ import ctypes
 
 import pygame
 
-from clases.bank import Bank
-from clases.card import Card
-from clases.deck import Deck
-from clases.player import Player
+from classes.bank import Bank
+from classes.card import Card
+from classes.deck import Deck
+from classes.player import Player
 from table.table import Table
 
 lib = ctypes.CDLL('cpp/lib/comb_calculator.dll')
@@ -223,6 +223,7 @@ class Game:
                 self.table_cards.append(self.deck.getCards()[j])
 
             winner = None
+            self.winner_comb = ""
 
             stages = ["Pre-flop", "Flop", "Turn", "River", "Showdown"]
             for stage in stages:
@@ -284,7 +285,7 @@ class Game:
                                 command = self.table.turn(player, self.biggest_bet)
                                 if command == "Exit":
                                     break
-                                else:
+                                elif command != "Check":
                                     command.execute()
 
                                 self.table.print_bank()

@@ -17,7 +17,6 @@ from functions.draw_func.drawText import DrawText
 from functions.loadImage import LoadImage
 from functions.poker_commands.bet_n_rais_command import BetNRaisCommand
 from functions.poker_commands.callCommand import CallCommand
-from functions.poker_commands.checkCommand import CheckCommand
 from functions.poker_commands.foldCommand import FoldCommand
 from functions.poker_commands.skipCommand import SkipCommand
 
@@ -427,6 +426,7 @@ class Table:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if add_chips_button.collidepoint(event.pos):
                         command = "Add"
+                        self.screen.blit(saved_table_image, (0, 0))
                         running2 = False
 
                     elif exit_button.collidepoint(event.pos):
@@ -774,7 +774,7 @@ class Table:
                     elif self.up_button_rect.collidepoint(event.pos):
                         if int(self.player_bet) < player.getChips():
                             if int(self.player_bet) + 10 > player.getChips():
-                                self.player_bet = player.getChips()
+                                self.player_bet = str(player.getChips())
                             else:
                                 self.player_bet = str(int(self.player_bet) + 10)
 
@@ -801,7 +801,7 @@ class Table:
 
                     elif self.check_n_call_button_rect.collidepoint(event.pos):
                         if self.check_call_skip_button_text == "Check":
-                            command = CheckCommand(player, self.hash_player_bet)
+                            command = "Check"
                             running = False
 
                         elif self.check_call_skip_button_text == "Call":
