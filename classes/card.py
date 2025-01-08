@@ -9,6 +9,3 @@ class Card:
 
     def getValue(self):
         return self.value
-
-    def toString(self):
-        return f"{self.value} of {self.suit}"
