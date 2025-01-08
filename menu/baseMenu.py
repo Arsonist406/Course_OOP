@@ -1,11 +1,10 @@
-from abc import ABC, abstractmethod
 
 import pygame
 
 from functions.loadImage import LoadImage
 
 
-class BaseMenu(ABC):
+class BaseMenu:
     def __init__(self, background_image_path, screen=None):
         if screen is None:
             pygame.init()
@@ -23,14 +22,11 @@ class BaseMenu(ABC):
         self.minor = pygame.font.Font(None, 36)
         self.title = pygame.font.Font(None, 64)
 
-    @abstractmethod
     def draw_text(self):
         pass
 
-    @abstractmethod
     def draw_buttons(self):
         pass
 
-    @abstractmethod
     def execute(self):
         pass
