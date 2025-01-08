@@ -93,7 +93,6 @@ class Table:
             self.hash_card_image[card] = func.execute()
 
         self.deck_pos = (960, 140)
-        self.discard_deck_pos = (300, 180)
 
         self.deal_card_pos = [(355, 360), (495, 360), (635, 360), (775, 360), (915, 360)]
         self.deal_card_ang = [0, 0, 0, 0, 0]
