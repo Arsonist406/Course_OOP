@@ -104,11 +104,11 @@ class Table:
         pos2 = (1180, 360), (1180, 390)
         pos3 = (620, 100), (650, 100)
         pos4 = (100, 360), (100, 390)
-        self.pos = [pos3, pos4, pos1, pos2]
-        self.ang = [0, 90, 180, 270]
+        position = [pos3, pos4, pos1, pos2]
+        angle = [0, 90, 180, 270]
         self.hash_player_pos = {}
         self.hash_player_ang = {}
-        for player, pos, ang in zip(self.players, self.pos, self.ang):
+        for player, pos, ang in zip(self.players, position, angle):
             self.hash_player_pos[player] = pos
             self.hash_player_ang[player] = ang
 
